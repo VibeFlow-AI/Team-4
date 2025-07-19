@@ -1,111 +1,189 @@
-
 openapi: 3.0.3
 info:
   title: EduVibe API
-  version: "1.0.0"
-  description: |
-    REST API that powers the EduVibe mentoring platform.  
-    Provides authentication, onboarding, mentor discovery, booking flow, and dashboards
-    as described in the hackathon Figma designs and case study.
-
+  version: 1.0.0
+  description: "REST API that powers the EduVibe mentoring platform.  \nProvides authentication,\
+    \ onboarding, mentor discovery, booking flow, and dashboards\nas described in\
+    \ the hackathon Figma designs and case study.\n"
 servers:
-  - url: https://api.eduvibe.ai/api/v1
-
+- url: https://api.eduvibe.ai/api/v1
 security:
-  - BearerAuth: []
-
+- BearerAuth: []
 components:
   securitySchemes:
     BearerAuth:
       type: http
       scheme: bearer
       bearerFormat: JWT
-
   schemas:
     User:
       type: object
       properties:
-        id: { type: string, format: uuid }
-        role: { type: string, enum: [student, mentor] }
-        name: { type: string }
-        email: { type: string, format: email }
-        avatarUrl: { type: string, format: uri, nullable: true }
-      required: [id, role, name, email]
-
+        id:
+          type: string
+          format: uuid
+        role:
+          type: string
+          enum:
+          - student
+          - mentor
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        avatarUrl:
+          type: string
+          format: uri
+          nullable: true
+      required:
+      - id
+      - role
+      - name
+      - email
     PublicUser:
       allOf:
-        - $ref: '#/components/schemas/User'
-        - type: object
-          properties:
-            email: { readOnly: true }
-
+      - $ref: '#/components/schemas/User'
+      - type: object
+        properties:
+          email:
+            readOnly: true
     StudentOnboarding:
       type: object
       properties:
-        fullName: { type: string }
-        age: { type: integer, minimum: 5 }
-        contactNumber: { type: string }
-        school: { type: string }
-        educationLevel: { type: string }
+        fullName:
+          type: string
+        age:
+          type: integer
+          minimum: 5
+        contactNumber:
+          type: string
+        school:
+          type: string
+        educationLevel:
+          type: string
         subjects:
           type: array
-          items: { type: string }
+          items:
+            type: string
         skills:
           type: array
           items:
             type: object
             properties:
-              subject: { type: string }
-              level: { type: string }
-        preferredLearningStyle: { type: string, nullable: true }
-        accommodations: { type: string, nullable: true }
-      required: [fullName, age, contactNumber, school, educationLevel, subjects]
-
+              subject:
+                type: string
+              level:
+                type: string
+        preferredLearningStyle:
+          type: string
+          nullable: true
+        accommodations:
+          type: string
+          nullable: true
+      required:
+      - fullName
+      - age
+      - contactNumber
+      - school
+      - educationLevel
+      - subjects
     MentorOnboarding:
       type: object
       properties:
-        fullName: { type: string }
-        age: { type: integer }
-        contactNumber: { type: string }
-        bio: { type: string }
-        professionalRole: { type: string }
+        fullName:
+          type: string
+        age:
+          type: integer
+        contactNumber:
+          type: string
+        bio:
+          type: string
+        professionalRole:
+          type: string
         subjects:
           type: array
-          items: { type: string }
-        experienceYears: { type: integer }
+          items:
+            type: string
+        experienceYears:
+          type: integer
         preferredStudentLevels:
           type: array
-          items: { type: string }
-        linkedinUrl: { type: string, format: uri, nullable: true }
-        portfolioUrl: { type: string, format: uri, nullable: true }
-        avatarUrl: { type: string, format: uri, nullable: true }
-      required: [fullName, age, contactNumber, bio, professionalRole, subjects, experienceYears]
-
+          items:
+            type: string
+        linkedinUrl:
+          type: string
+          format: uri
+          nullable: true
+        portfolioUrl:
+          type: string
+          format: uri
+          nullable: true
+        avatarUrl:
+          type: string
+          format: uri
+          nullable: true
+      required:
+      - fullName
+      - age
+      - contactNumber
+      - bio
+      - professionalRole
+      - subjects
+      - experienceYears
     Booking:
       type: object
       properties:
-        id: { type: string, format: uuid }
-        studentId: { type: string, format: uuid }
-        mentorId: { type: string, format: uuid }
-        sessionDateTime: { type: string, format: date-time }
-        durationMinutes: { type: integer, example: 120 }
-        paymentProofUrl: { type: string, format: uri }
-        status: { type: string, enum: [pending, confirmed, in-progress, completed, cancelled] }
-      required: [id, studentId, mentorId, sessionDateTime, durationMinutes, paymentProofUrl, status]
-
+        id:
+          type: string
+          format: uuid
+        studentId:
+          type: string
+          format: uuid
+        mentorId:
+          type: string
+          format: uuid
+        sessionDateTime:
+          type: string
+          format: date-time
+        durationMinutes:
+          type: integer
+          example: 120
+        paymentProofUrl:
+          type: string
+          format: uri
+        status:
+          type: string
+          enum:
+          - pending
+          - confirmed
+          - in-progress
+          - completed
+          - cancelled
+      required:
+      - id
+      - studentId
+      - mentorId
+      - sessionDateTime
+      - durationMinutes
+      - paymentProofUrl
+      - status
     ErrorResponse:
       type: object
       properties:
         error:
           type: object
           properties:
-            code: { type: integer }
-            message: { type: string }
+            code:
+              type: integer
+            message:
+              type: string
             details:
               type: array
-              items: { type: string }
-      required: [error]
-
+              items:
+                type: string
+      required:
+      - error
 paths:
   /auth/register:
     post:
@@ -118,11 +196,24 @@ paths:
             schema:
               type: object
               properties:
-                role: { type: string, enum: [student, mentor] }
-                email: { type: string, format: email }
-                password: { type: string, format: password }
-                name: { type: string }
-              required: [role, email, password, name]
+                role:
+                  type: string
+                  enum:
+                  - student
+                  - mentor
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  format: password
+                name:
+                  type: string
+              required:
+              - role
+              - email
+              - password
+              - name
       responses:
         '201':
           description: JWT pair returned
@@ -131,12 +222,14 @@ paths:
               schema:
                 type: object
                 properties:
-                  token: { type: string }
-                  refreshToken: { type: string }
-                  expiresIn: { type: integer }
+                  token:
+                    type: string
+                  refreshToken:
+                    type: string
+                  expiresIn:
+                    type: integer
         '400':
           $ref: '#/components/responses/BadRequest'
-
   /auth/login:
     post:
       summary: Login
@@ -148,9 +241,15 @@ paths:
             schema:
               type: object
               properties:
-                email: { type: string, format: email }
-                password: { type: string, format: password }
-              required: [email, password]
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  format: password
+              required:
+              - email
+              - password
       responses:
         '200':
           description: JWT pair returned
@@ -159,12 +258,14 @@ paths:
               schema:
                 type: object
                 properties:
-                  token: { type: string }
-                  refreshToken: { type: string }
-                  expiresIn: { type: integer }
+                  token:
+                    type: string
+                  refreshToken:
+                    type: string
+                  expiresIn:
+                    type: integer
         '400':
           $ref: '#/components/responses/BadRequest'
-
   /auth/refresh:
     post:
       summary: Refresh JWT
@@ -176,8 +277,10 @@ paths:
             schema:
               type: object
               properties:
-                refreshToken: { type: string }
-              required: [refreshToken]
+                refreshToken:
+                  type: string
+              required:
+              - refreshToken
       responses:
         '200':
           description: New JWT issued
@@ -186,10 +289,12 @@ paths:
               schema:
                 type: object
                 properties:
-                  token: { type: string }
-                  refreshToken: { type: string }
-                  expiresIn: { type: integer }
-
+                  token:
+                    type: string
+                  refreshToken:
+                    type: string
+                  expiresIn:
+                    type: integer
   /auth/logout:
     post:
       summary: Logout (invalidate refresh token)
@@ -200,8 +305,10 @@ paths:
             schema:
               type: object
               properties:
-                refreshToken: { type: string }
-              required: [refreshToken]
+                refreshToken:
+                  type: string
+              required:
+              - refreshToken
       responses:
         '200':
           description: Logged out message
@@ -210,8 +317,8 @@ paths:
               schema:
                 type: object
                 properties:
-                  message: { type: string }
-
+                  message:
+                    type: string
   /users/me:
     get:
       summary: Get current user profile
@@ -222,7 +329,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
-
     patch:
       summary: Update current user
       requestBody:
@@ -238,15 +344,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
-
   /users/{id}:
     get:
       summary: Public user profile
       parameters:
-        - in: path
-          name: id
-          required: true
-          schema: { type: string, format: uuid }
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+          format: uuid
       responses:
         '200':
           description: Public profile
@@ -254,7 +361,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PublicUser'
-
   /students/onboarding:
     post:
       summary: Complete student onboarding
@@ -271,15 +377,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
-
   /students/{id}:
     get:
       summary: Retrieve student profile
       parameters:
-        - in: path
-          name: id
-          required: true
-          schema: { type: string, format: uuid }
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+          format: uuid
       responses:
         '200':
           description: Student profile
@@ -287,20 +394,26 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
-
   /students/{id}/bookings:
     get:
       summary: List bookings for student
       parameters:
-        - in: path
-          name: id
-          required: true
-          schema: { type: string, format: uuid }
-        - in: query
-          name: status
-          schema:
-            type: string
-            enum: [pending, confirmed, in-progress, completed, cancelled]
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - in: query
+        name: status
+        schema:
+          type: string
+          enum:
+          - pending
+          - confirmed
+          - in-progress
+          - completed
+          - cancelled
       responses:
         '200':
           description: Array of bookings
@@ -310,7 +423,6 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Booking'
-
   /mentors/onboarding:
     post:
       summary: Complete mentor onboarding
@@ -327,15 +439,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
-
   /mentors/{id}:
     get:
       summary: Retrieve mentor profile
       parameters:
-        - in: path
-          name: id
-          required: true
-          schema: { type: string, format: uuid }
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+          format: uuid
       responses:
         '200':
           description: Mentor profile
@@ -343,29 +456,42 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
-
   /mentors:
     get:
       summary: Search mentors
       parameters:
-        - in: query
-          name: subjects
-          schema: { type: array, items: { type: string }, style: form, explode: false }
-        - in: query
-          name: level
-          schema: { type: string }
-        - in: query
-          name: language
-          schema: { type: string }
-        - in: query
-          name: duration
-          schema: { type: integer }
-        - in: query
-          name: page
-          schema: { type: integer, minimum: 1 }
-        - in: query
-          name: sort
-          schema: { type: string, enum: [rating, price] }
+      - in: query
+        name: subjects
+        schema:
+          type: array
+          items:
+            type: string
+          style: form
+          explode: false
+      - in: query
+        name: level
+        schema:
+          type: string
+      - in: query
+        name: language
+        schema:
+          type: string
+      - in: query
+        name: duration
+        schema:
+          type: integer
+      - in: query
+        name: page
+        schema:
+          type: integer
+          minimum: 1
+      - in: query
+        name: sort
+        schema:
+          type: string
+          enum:
+          - rating
+          - price
       responses:
         '200':
           description: Paginated mentor list
@@ -378,13 +504,14 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/User'
-                  page: { type: integer }
-                  total: { type: integer }
-
+                  page:
+                    type: integer
+                  total:
+                    type: integer
   /mentors/recommended:
     get:
       summary: List personalised mentor recommendations
-      responses:
+      responses: &id001
         '200':
           description: Recommended mentors
           content:
@@ -393,15 +520,35 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/User'
-
+    post:
+      summary: Get personalised mentor recommendations (explicit studentId)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                studentId:
+                  type: string
+                  format: uuid
+                limit:
+                  type: integer
+                  default: 10
+                  minimum: 1
+              required:
+              - studentId
+      responses: *id001
   /mentors/{id}/sessions:
     get:
       summary: List mentor sessions
       parameters:
-        - in: path
-          name: id
-          required: true
-          schema: { type: string, format: uuid }
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+          format: uuid
       responses:
         '200':
           description: Sessions
@@ -411,15 +558,16 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Booking'
-
   /mentors/{id}/analytics:
     get:
       summary: Mentor dashboard analytics
       parameters:
-        - in: path
-          name: id
-          required: true
-          schema: { type: string, format: uuid }
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+          format: uuid
       responses:
         '200':
           description: Analytics data
@@ -430,11 +578,12 @@ paths:
                 properties:
                   agePie:
                     type: object
-                    additionalProperties: { type: integer }
+                    additionalProperties:
+                      type: integer
                   subjectBar:
                     type: object
-                    additionalProperties: { type: integer }
-
+                    additionalProperties:
+                      type: integer
   /bookings:
     post:
       summary: Create a booking
@@ -445,10 +594,23 @@ paths:
             schema:
               type: object
               properties:
-                mentorId: { type: string, format: uuid }
-                sessionDateTime: { type: string, format: date-time }
-                paymentProofUrl: { type: string, format: uri }
-              required: [mentorId, sessionDateTime, paymentProofUrl]
+                mentorId:
+                  type: string
+                  format: uuid
+                sessionDateTime:
+                  type: string
+                  format: date-time
+                paymentProofUrl:
+                  type: string
+                  format: uri
+                studentId:
+                  type: string
+                  format: uuid
+              required:
+              - studentId
+              - mentorId
+              - sessionDateTime
+              - paymentProofUrl
       responses:
         '201':
           description: Booking created
@@ -456,15 +618,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Booking'
-
   /bookings/{id}:
     get:
       summary: Get booking details
       parameters:
-        - in: path
-          name: id
-          required: true
-          schema: { type: string, format: uuid }
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+          format: uuid
       responses:
         '200':
           description: Booking
@@ -472,26 +635,28 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Booking'
-
     delete:
       summary: Cancel a booking
       parameters:
-        - in: path
-          name: id
-          required: true
-          schema: { type: string, format: uuid }
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+          format: uuid
       responses:
         '204':
           description: Booking cancelled
-
   /sessions/{id}/status:
     patch:
       summary: Update session status
       parameters:
-        - in: path
-          name: id
-          required: true
-          schema: { type: string, format: uuid }
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+          format: uuid
       requestBody:
         required: true
         content:
@@ -501,8 +666,12 @@ paths:
               properties:
                 status:
                   type: string
-                  enum: [confirmed, in-progress, completed]
-              required: [status]
+                  enum:
+                  - confirmed
+                  - in-progress
+                  - completed
+              required:
+              - status
       responses:
         '200':
           description: Updated booking
@@ -510,4 +679,3 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Booking'
-
