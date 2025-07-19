@@ -1,13 +1,11 @@
-import HomeLayout from "@/layouts/HomeLayout";
 import { AuthModal } from "@/components/auth/AuthModal";
 
 function LoginPage() {
   return (
-    <HomeLayout>
-      <div>
-        <AuthModal />
-      </div>
-    </HomeLayout>
+    <div className="flex justify-center items-center p-32">
+
+      <AuthModal />
+    </div>
   )
 }
 
