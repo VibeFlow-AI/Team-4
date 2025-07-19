@@ -19,7 +19,7 @@ const homeButtons: NavbarButton[] = [
 export default function HomeLayout({ children }: HomeLayoutProps) {
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#F4F4F4' }}>
-      <Navbar links={homeLinks} buttons={homeButtons} />
+      <Navbar links={homeLinks} buttons={homeButtons} home={true}/>
       {children}
     </div>
   );

@@ -1,5 +1,10 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+} from "@/components/ui/dropdown-menu";
 
 export interface NavbarLink {
   label: string;
@@ -18,20 +23,20 @@ export interface NavbarButton {
 interface NavbarProps {
   links?: NavbarLink[];
   buttons?: NavbarButton[];
+  dropdownIcons?: React.ReactNode[]; // Array of icon components
+  userDp?: string; // User display picture URL
+  home: boolean;
 }
 
-export function Navbar({ links = [], buttons = [] }: NavbarProps) {
-  const navigate = useNavigate();
+export function Navbar({ links = [], buttons = [], dropdownIcons = [], userDp, home }: NavbarProps) {
   return (
-    <nav className="mx-[5%] z-50 bg-white rounded-lg border border-gray-100 px-36 py-3 flex items-center justify-between h-24">
-      {/* Logo */}
-      <div className="flex items-center">
-        <img 
-          src="/logo.png" 
-          alt="Logo" 
-          className="w-12 h-12 mr-4"
-        />
-      </div>
+    <nav className={`${home ? "mx-[5%]" : ""} z-50 bg-white rounded-lg border border-gray-100 ${home ? "px-12": "px-8"} py-3 flex items-center justify-between h-24`}>
+      {/* Logo with Dropdown */}
+      <img 
+              src="/logo.png" 
+              alt="Logo" 
+              className="w-12 h-12 mr-4"
+            />
 
       {/* Navigation Links */}
       <div className="flex items-center space-x-8 text-2xl">
@@ -70,15 +75,6 @@ export function Navbar({ links = [], buttons = [] }: NavbarProps) {
             </Button>
           )
         ))}
-        {/* Default Get Started button if no buttons provided */}
-        {buttons.length === 0 && (
-          <Button 
-            className="bg-black text-white hover:bg-gray-800 transition-colors"
-            onClick={() => navigate("/auth")}
-          >
-            Get Started
-          </Button>
-        )}
       </div>
     </nav>
   );
