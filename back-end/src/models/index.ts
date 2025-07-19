@@ -1,9 +1,9 @@
 // Export all models
-export { User, IUser } from './User';
-export { Student, IStudent, ISkill } from './Student';
-export { Mentor, IMentor } from './Mentor';
 export { Booking, IBooking } from './Booking';
-export { Item, IItem } from './Item';
+export { IItem, Item } from './Item';
+export { IMentor, Mentor } from './Mentor';
+export { ISkill, IStudent, Student } from './Student';
+export { IUser, User } from './User';
 
 // Re-export mongoose for convenience
 export { Types } from 'mongoose';
