@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
 export interface NavbarLink {
@@ -21,6 +21,7 @@ interface NavbarProps {
 }
 
 export function Navbar({ links = [], buttons = [] }: NavbarProps) {
+  const navigate = useNavigate();
   return (
     <nav className="mx-[5%] z-50 bg-white rounded-lg border border-gray-100 px-36 py-3 flex items-center justify-between h-24">
       {/* Logo */}
@@ -69,6 +70,15 @@ export function Navbar({ links = [], buttons = [] }: NavbarProps) {
             </Button>
           )
         ))}
+        {/* Default Get Started button if no buttons provided */}
+        {buttons.length === 0 && (
+          <Button 
+            className="bg-black text-white hover:bg-gray-800 transition-colors"
+            onClick={() => navigate("/auth")}
+          >
+            Get Started
+          </Button>
+        )}
       </div>
     </nav>
   );

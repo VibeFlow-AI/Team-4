@@ -1,15 +1,21 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import HomePage from "./pages/home";
 import LoginPage from "./pages/login";
 import StudentLayout from "./layouts/StudentLayout";
 import MentorLayout from "./layouts/MentorLayout";
 import StudentHomePage from "./pages/student";
 import MentorHomePage from "./pages/mentor";
+import { StudentDashboard } from "./components/dashboard/StudentDashboard";
+import { MentorDashboard } from "./components/dashboard/MentorDashboard";
+import { AuthModal } from "./components/auth/AuthModal";
 
-function App() {
+function AppRoutes() {
+  const location = useLocation();
+  const state = location.state as { backgroundLocation?: Location };
+
   return (
-    <Router>
-      <Routes>
+    <>
+      <Routes location={state?.backgroundLocation || location}>
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
         {/* Student routes */}
@@ -21,7 +27,22 @@ function App() {
           <Route index element={<MentorHomePage />} />
           <Route path="dashboard" element={<MentorHomePage />} />
         </Route>
+        {/* Dashboard routes */}
+        <Route path="/dashboard/student" element={<StudentDashboard />} />
+        <Route path="/dashboard/mentor" element={<MentorDashboard />} />
       </Routes>
+      {/* Modal route */}
+      {location.pathname === "/auth" && (
+        <AuthModal />
+      )}
+    </>
+  );
+}
+
+function App() {
+  return (
+    <Router>
+      <AppRoutes />
     </Router>
   );
 }
