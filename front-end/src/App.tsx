@@ -7,6 +7,7 @@ import StudentHomePage from "./pages/student";
 import MentorHomePage from "./pages/mentor";
 import { StudentDashboard } from "./components/dashboard/StudentDashboard";
 import { MentorDashboard } from "./components/dashboard/MentorDashboard";
+import { AuthModal } from "./components/auth/AuthModal";
 
 function App() {
   return (
@@ -26,6 +27,8 @@ function App() {
         {/* Dashboard routes */}
         <Route path="/dashboard/student" element={<StudentDashboard />} />
         <Route path="/dashboard/mentor" element={<MentorDashboard />} />
+        {/* Auth route */}
+        <Route path="/auth" element={<AuthModal isOpen={true} onClose={() => {}} />} />
       </Routes>
     </Router>
   );
