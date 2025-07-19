@@ -1,8 +1,12 @@
 import { Router } from 'express';
 import {
-  getRecommendations,
-  getRecommendationsForStudent,
-  getRecommendationsBySearch,
+    getMentorProfile,
+    searchMentors,
+} from '../controllers/mentorSearchController';
+import {
+    getRecommendations,
+    getRecommendationsBySearch,
+    getRecommendationsForStudent,
 } from '../controllers/recommendationController';
 // import { authenticateToken } from '../middlewares/auth'; // You'll need to create this
 
@@ -28,5 +32,18 @@ router.post('/recommended', getRecommendationsForStudent);
  * Optional authentication (better recommendations if authenticated)
  */
 router.get('/recommended/search', getRecommendationsBySearch);
+
+/**
+ * GET /mentors/search
+ * Search and filter mentors with intelligent matching
+ * Optional authentication (personalized results if authenticated)
+ */
+router.get('/search', searchMentors);
+
+/**
+ * GET /mentors/:id
+ * Get detailed mentor profile
+ */
+router.get('/:id', getMentorProfile);
 
 export default router;

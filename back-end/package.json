@@ -8,6 +8,7 @@
     "build": "tsc",
     "start": "node dist/server.js",
     "dev": "nodemon --exec \"npx tsx ./src/server.ts\"",
+    "seed": "npx tsx ./src/scripts/seedDatabase.ts",
     "lint": "eslint 'src/**/*.ts'"
   },
   "keywords": [],
@@ -31,9 +32,13 @@
   },
   "dependencies": {
     "@prisma/client": "^6.11.1",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/mongoose": "^5.11.96",
+    "bcryptjs": "^3.0.2",
     "cors": "^2.8.5",
     "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.16.4"
   }
 }

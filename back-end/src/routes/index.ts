@@ -1,19 +1,25 @@
 import { Router } from 'express';
+import authRoutes from './authRoutes';
+import bookingRoutes from './bookingRoutes';
 import recommendationRoutes from './recommendationRoutes';
-// import authRoutes from './authRoutes';
-// import userRoutes from './userRoutes';
+import userRoutes from './userRoutes';
 // import studentRoutes from './studentRoutes';
-// import bookingRoutes from './bookingRoutes';
 
 const router = Router();
+
+// Mount auth routes (no authentication required)
+router.use('/auth', authRoutes);
+
+// Mount user routes
+router.use('/users', userRoutes);
 
 // Mount recommendation routes under /mentors
 router.use('/mentors', recommendationRoutes);
 
+// Mount booking routes
+router.use('/bookings', bookingRoutes);
+
 // Add other routes here when created
-// router.use('/auth', authRoutes);
-// router.use('/users', userRoutes);
 // router.use('/students', studentRoutes);
-// router.use('/bookings', bookingRoutes);
 
 export default router;

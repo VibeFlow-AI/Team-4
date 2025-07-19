@@ -1,4 +1,4 @@
-import mongoose, { Document, Schema, Types } from 'mongoose';
+import mongoose, { Schema, Document, Types } from 'mongoose';
 
 export interface ISkill {
   subject: string;
@@ -105,7 +105,7 @@ const studentSchema = new Schema<IStudent>({
 });
 
 // Indexes for recommendations and queries
-// Note: userId already has a unique index from the schema definition
+studentSchema.index({ userId: 1 });
 studentSchema.index({ subjects: 1 });
 studentSchema.index({ 'skills.subject': 1 });
 studentSchema.index({ educationLevel: 1 });

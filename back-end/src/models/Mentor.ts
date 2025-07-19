@@ -1,4 +1,4 @@
-import mongoose, { Document, Schema, Types } from 'mongoose';
+import mongoose, { Schema, Document, Types } from 'mongoose';
 
 export interface IMentor extends Document {
   _id: string;
@@ -142,7 +142,7 @@ const mentorSchema = new Schema<IMentor>({
 });
 
 // Indexes for search and recommendations
-// Note: userId already has a unique index from the schema definition
+mentorSchema.index({ userId: 1 });
 mentorSchema.index({ subjects: 1 });
 mentorSchema.index({ averageRating: -1 });
 mentorSchema.index({ ratePerSession: 1 });
