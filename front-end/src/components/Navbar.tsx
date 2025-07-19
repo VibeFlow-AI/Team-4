@@ -1,5 +1,7 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { AuthModal } from "@/components/auth/AuthModal";
 
 export interface NavbarLink {
   label: string;
@@ -21,6 +23,7 @@ interface NavbarProps {
 }
 
 export function Navbar({ links = [], buttons = [] }: NavbarProps) {
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   return (
     <nav className="mx-[5%] z-50 bg-white rounded-lg border border-gray-100 px-36 py-3 flex items-center justify-between h-24">
       {/* Logo */}
@@ -69,7 +72,22 @@ export function Navbar({ links = [], buttons = [] }: NavbarProps) {
             </Button>
           )
         ))}
+        
+        {/* Default Get Started button if no buttons provided */}
+        {buttons.length === 0 && (
+          <Button 
+            className="bg-black text-white hover:bg-gray-800 transition-colors"
+            onClick={() => setIsAuthModalOpen(true)}
+          >
+            Get Started
+          </Button>
+        )}
       </div>
+      
+      <AuthModal 
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+      />
     </nav>
   );
 } 

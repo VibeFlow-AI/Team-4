@@ -5,6 +5,8 @@ import StudentLayout from "./layouts/StudentLayout";
 import MentorLayout from "./layouts/MentorLayout";
 import StudentHomePage from "./pages/student";
 import MentorHomePage from "./pages/mentor";
+import { StudentDashboard } from "./components/dashboard/StudentDashboard";
+import { MentorDashboard } from "./components/dashboard/MentorDashboard";
 
 function App() {
   return (
@@ -21,6 +23,9 @@ function App() {
           <Route index element={<MentorHomePage />} />
           <Route path="dashboard" element={<MentorHomePage />} />
         </Route>
+        {/* Dashboard routes */}
+        <Route path="/dashboard/student" element={<StudentDashboard />} />
+        <Route path="/dashboard/mentor" element={<MentorDashboard />} />
       </Routes>
     </Router>
   );
