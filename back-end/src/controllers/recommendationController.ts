@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { RecommendationService } from '../services/recommendationService';
 import { RecommendationRequest } from '../types/recommendation';
 

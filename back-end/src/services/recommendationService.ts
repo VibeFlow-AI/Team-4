@@ -1,10 +1,10 @@
-import { Student, IStudent } from '../models/Student';
-import { Mentor, IMentor } from '../models/Mentor';
 import { Booking } from '../models/Booking';
-import { 
-  RecommendationCriteria, 
-  MentorScore, 
-  RecommendationResult 
+import { IMentor, Mentor } from '../models/Mentor';
+import { IStudent, Student } from '../models/Student';
+import {
+  MentorScore,
+  RecommendationCriteria,
+  RecommendationResult
 } from '../types/recommendation';
 
 export class RecommendationService {

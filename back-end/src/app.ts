@@ -1,6 +1,5 @@
 import cors from 'cors';
 import express from 'express';
-import config from './config/config'; // Load config (which loads dotenv) first
 import { connectDatabase } from './config/database';
 import { errorHandler } from './middlewares/errorHandler';
 import apiRoutes from './routes/index';

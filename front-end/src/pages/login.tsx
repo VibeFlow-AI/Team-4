@@ -1,10 +1,11 @@
 import HomeLayout from "@/layouts/HomeLayout";
+import { AuthModal } from "@/components/auth/AuthModal";
 
 function LoginPage() {
   return (
     <HomeLayout>
       <div>
-        <h1>Login</h1>
+        <AuthModal />
       </div>
     </HomeLayout>
   )
