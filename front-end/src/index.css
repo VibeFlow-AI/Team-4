@@ -149,3 +149,16 @@
   animation: scroll-left 4s cubic-bezier(0.22, 1, 0.36, 1) infinite;
   animation-fill-mode: forwards;
 }
+
+@keyframes vertical-scroll {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-50%);
+  }
+}
+
+.animate-vertical-scroll {
+  animation: vertical-scroll 12s linear infinite;
+}
