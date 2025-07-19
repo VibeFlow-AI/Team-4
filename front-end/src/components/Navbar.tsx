@@ -1,7 +1,26 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
-export function Navbar() {
+export interface NavbarLink {
+  label: string;
+  to: string;
+  className?: string;
+}
+
+export interface NavbarButton {
+  label: string;
+  to?: string;
+  onClick?: () => void;
+  variant?: "default" | "outline";
+  className?: string;
+}
+
+interface NavbarProps {
+  links?: NavbarLink[];
+  buttons?: NavbarButton[];
+}
+
+export function Navbar({ links = [], buttons = [] }: NavbarProps) {
   return (
     <nav className="mx-[5%] z-50 bg-white rounded-lg border border-gray-100 px-36 py-3 flex items-center justify-between h-24">
       {/* Logo */}
@@ -15,35 +34,42 @@ export function Navbar() {
 
       {/* Navigation Links */}
       <div className="flex items-center space-x-8 text-2xl">
-        <Link 
-          to="/" 
-          className="text-black font-medium hover:text-gray-600 transition-colors"
-        >
-          Home
-        </Link>
-        <Link 
-          to="/sessions" 
-          className="text-black font-medium hover:text-gray-600 transition-colors"
-        >
-          Sessions
-        </Link>
-        <Link 
-          to="/about" 
-          className="text-black font-medium hover:text-gray-600 transition-colors"
-        >
-          About
-        </Link>
+        {links.map((link) => (
+          <Link
+            key={link.to}
+            to={link.to}
+            className={link.className || "text-black font-medium hover:text-gray-600 transition-colors"}
+          >
+            {link.label}
+          </Link>
+        ))}
       </div>
 
-      {/* Call to Action Button */}
-      <Button 
-        className="bg-black text-white hover:bg-gray-800 transition-colors"
-        asChild
-      >
-        <Link to="/login">
-          Get Started
-        </Link>
-      </Button>
+      {/* Dynamic Buttons */}
+      <div className="flex items-center space-x-4">
+        {buttons.map((btn, idx) => (
+          btn.to ? (
+            <Button
+              key={btn.label + idx}
+              size="lg"
+              className={btn.className || "bg-black text-white hover:bg-gray-800 transition-colors"}
+              variant={btn.variant || "default"}
+              asChild
+            >
+              <Link to={btn.to}>{btn.label}</Link>
+            </Button>
+          ) : (
+            <Button
+              key={btn.label + idx}
+              className={btn.className || "bg-black text-white hover:bg-gray-800 transition-colors"}
+              variant={btn.variant || "default"}
+              onClick={btn.onClick}
+            >
+              {btn.label}
+            </Button>
+          )
+        ))}
+      </div>
     </nav>
   );
 } 

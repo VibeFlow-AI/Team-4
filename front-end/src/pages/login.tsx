@@ -1,8 +1,12 @@
+import HomeLayout from "@/components/HomeLayout";
+
 function LoginPage() {
   return (
-    <div>
-      <h1>Login</h1>
-    </div>
+    <HomeLayout>
+      <div>
+        <h1>Login</h1>
+      </div>
+    </HomeLayout>
   )
 }
 

@@ -1,15 +1,12 @@
 
-import { Navbar } from "@/components/Navbar";
+import HomeLayout from "@/components/HomeLayout";
 import Hero from "@/components/home/hero";
 
 function HomePage() {
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#F4F4F4' }}>
-      <Navbar />
+    <HomeLayout>
       <Hero />
-      
-      
-    </div>
+    </HomeLayout>
   );
 }
 

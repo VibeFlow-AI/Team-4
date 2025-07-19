@@ -9,7 +9,7 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
   
   // For now, we'll use a simple localStorage check
   // In a real app, you'd want to check against your auth state management
-  const isAuthenticated = localStorage.getItem("token") !== null;
+  const isAuthenticated = localStorage.getItem("token") === null;
   
   if (!isAuthenticated) {
     // Redirect to login page with the return url
