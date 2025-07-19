@@ -35,7 +35,7 @@ function Hero() {
 
   return (
     <>
-      <section className="w-full bg-[#f4f4f4] py-16 md:py-24">
+      <section className="w-full py-16 md:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col lg:flex-row items-center lg:items-start justify-between gap-16">
           {/* Left: Heading, subtitle, button */}
           <div className="flex-1 w-full max-w-2xl flex flex-col items-start">

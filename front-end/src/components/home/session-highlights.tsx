@@ -45,7 +45,7 @@ const SESSIONS: SessionCardData[] = [
 
 function SessionHighlights() {
   return (
-    <section className="w-full bg-gradient-to-br from-blue-100 via-purple-100 to-yellow-100 py-16 px-2 sm:px-4">
+    <section className="w-full py-16 px-2 sm:px-4">
       <div className="max-w-7xl mx-auto">
         <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-center mb-4 text-black">
           Session Highlights – Trending Now
