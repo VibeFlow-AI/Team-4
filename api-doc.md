@@ -1,200 +1,175 @@
-# EduVibe API Documentation (v1)
+Below is a **fully-expanded reference** for every public EduVibe endpoint.
+For each one you’ll find **URL, HTTP method, path variables, query parameters, request body schema, success response, and common errors**.
 
-## Introduction
-
-The EduVibe REST API powers the web and mobile clients for **students** and **mentors** described in the VibeFlow hackathon case study.
-It supports:
-
-* Multi-step onboarding for students and mentors
-* Mentor discovery with personalised recommendations and rich filtering
-* Booking & payment upload for 2-hour mentor sessions
-* Dashboards—student bookings and mentor session analytics
-
-All endpoints are versioned under `/api/v1`.
+> **Notation**
+> • *T* = string  • *I* = integer  • *B* = boolean  • *ISO* = ISO-8601 date-time
+> • Optional fields are marked **?**.
+> • All payload examples are JSON (`Content-Type: application/json; charset=utf-8`).
+> • All endpoints require the `Authorization: Bearer <JWT>` header unless explicitly noted “No auth”.
 
 ---
 
-## Authentication
+## 1  Authentication
 
-| Mechanism      | Details                                                                                                                                                                                                                |
-| -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **JWT Bearer** | After a successful login/registration, the server returns a signed JSON Web Token. Send it in `Authorization: Bearer <token>` with each subsequent request. Tokens expire after **24 h**; refresh via `/auth/refresh`. |
+| #   | URL              | Method   | Path Vars | Query | Request Body                                                   | Success (200/201)                                  | Errors         |
+| --- | ---------------- | -------- | --------- | ----- | -------------------------------------------------------------- | -------------------------------------------------- | -------------- |
+| 1.1 | `/auth/register` | **POST** | –         | –     | `{ role: "student" \| "mentor", email:T, password:T, name:T }` | `{ token:T, refreshToken:T, expiresIn:I }` **201** | 400 validation |
+| 1.2 | `/auth/login`    | **POST** | –         | –     | `{ email:T, password:T }`                                      | idem **200**                                       | 400, 401       |
+| 1.3 | `/auth/refresh`  | **POST** | –         | –     | `{ refreshToken:T }`                                           | idem **200**                                       | 400, 401       |
+| 1.4 | `/auth/logout`   | **POST** | –         | –     | `{ refreshToken:T }`                                           | `{ message:"logged out" }` **200**                 | 400            |
 
----
-
-## Endpoints
-
-### 1. Auth
-
-| URL              | Method | Description                                                                 |
-| ---------------- | ------ | --------------------------------------------------------------------------- |
-| `/auth/register` | `POST` | Register **student** or **mentor**. Body: `{ role, email, password, name }` |
-| `/auth/login`    | `POST` | Obtain JWT. Body: `{ email, password }`                                     |
-| `/auth/logout`   | `POST` | Invalidate refresh token (optional).                                        |
-| `/auth/refresh`  | `POST` | Issue new JWT using a valid refresh token.                                  |
-
-<details><summary>📝 Request / Response examples</summary>
-
-```http
-POST /api/v1/auth/login
-Content-Type: application/json
-
-{ "email": "maya@example.com", "password": "hunter2" }
-```
-
-```http
-HTTP/1.1 200 OK
-{ "token": "<jwt>", "refreshToken": "<refresh>" }
-```
-
-</details>
+**No auth** required for 1.1 – 1.3.
 
 ---
 
-### 2. User profile
+## 2  User Profiles
 
-| URL         | Method  | Description              |
-| ----------- | ------- | ------------------------ |
-| `/users/me` | `GET`   | Current user (uses JWT). |
-| `/users/me` | `PATCH` | Update profile fields.   |
+| #   | URL           | Method    | Path Vars   | Query | Request Body    | Success                | Errors   |
+| --- | ------------- | --------- | ----------- | ----- | --------------- | ---------------------- | -------- |
+| 2.1 | `/users/me`   | **GET**   | –           | –     | –               | `User` **200**         | 401      |
+| 2.2 | `/users/me`   | **PATCH** | –           | –     | `Partial<User>` | updated `User` **200** | 400, 401 |
+| 2.3 | `/users/{id}` | **GET**   | `{id:uuid}` | –     | –               | `PublicUser` **200**   | 404      |
 
----
+`User` object
 
-### 3. Student onboarding & flows
-
-| URL                      | Method | Description                                                                            |
-| ------------------------ | ------ | -------------------------------------------------------------------------------------- |
-| `/students/onboarding`   | `POST` | Submit multi-part onboarding form (basic info, academic background, subject & skills). |
-| `/students/:id`          | `GET`  | Public student profile (limited fields).                                               |
-| `/students/:id/bookings` | `GET`  | All session bookings for student (explore vs. booked-tab population).                  |
-
----
-
-### 4. Mentor onboarding & dashboard
-
-| URL                      | Method | Description                                                        |
-| ------------------------ | ------ | ------------------------------------------------------------------ |
-| `/mentors/onboarding`    | `POST` | Submit mentor onboarding (personal info, expertise, social links). |
-| `/mentors/:id`           | `GET`  | Public mentor profile.                                             |
-| `/mentors/:id/sessions`  | `GET`  | Upcoming & past sessions (mentor dashboard card list).             |
-| `/mentors/:id/analytics` | `GET`  | Aggregated stats: student-age pie & subject bar series.            |
-
----
-
-### 5. Mentor discovery & recommendation
-
-| URL                    | Method | Description                                                                                |
-| ---------------------- | ------ | ------------------------------------------------------------------------------------------ |
-| `/mentors`             | `GET`  | Search mentors. Query params: `subjects`, `level`, `language`, `duration`, `page`, `sort`. |
-| `/mentors/recommended` | `GET`  | Personalised list ordered by matching algorithm (top suggestions first).                   |
-
-<details><summary>Example request</summary>
-
-`GET /api/v1/mentors?subjects=Physics,Biology&level=Grade10&language=English`
-
-</details>
-
----
-
-### 6. Booking flow
-
-| URL                    | Method   | Description                                                                                           |
-| ---------------------- | -------- | ----------------------------------------------------------------------------------------------------- |
-| `/bookings`            | `POST`   | Create a booking. Body: `{ mentorId, sessionDateTimeISO, paymentProofUrl }` – duration fixed **2 h**. |
-| `/bookings/:id`        | `GET`    | Booking details.                                                                                      |
-| `/bookings/:id`        | `DELETE` | Cancel (if >24 h before start).                                                                       |
-| `/sessions/:id/status` | `PATCH`  | Mentor accepts / marks “in-progress” / “completed”.                                                   |
-
----
-
-## Common Schemas (JSON)
-
-### `User`
-
-```json
+```jsonc
 {
   "id": "uuid",
-  "role": "student | mentor",
-  "name": "string",
-  "email": "string",
-  "avatarUrl": "string | null"
+  "role": "student",
+  "name": "Maya Jayawardena",
+  "email": "maya@example.com",
+  "avatarUrl": null
 }
 ```
 
-### `Booking`
+---
+
+## 3  Student Module
+
+| #   | URL                       | Method   | Path Vars   | Query              | Request Body        | Success                  | Errors   |
+| --- | ------------------------- | -------- | ----------- | ------------------ | ------------------- | ------------------------ | -------- |
+| 3.1 | `/students/onboarding`    | **POST** | –           | –                  | `StudentOnboarding` | `StudentProfile` **201** | 400      |
+| 3.2 | `/students/{id}`          | **GET**  | `{id:uuid}` | –                  | –                   | `StudentProfile` **200** | 404      |
+| 3.3 | `/students/{id}/bookings` | **GET**  | `{id:uuid}` | `status?`:T (enum) | –                   | `[Booking]` **200**      | 403, 404 |
+
+`StudentOnboarding` (schema)
+
+```jsonc
+{
+  "fullName": "T",
+  "age": I,
+  "contactNumber": "T",
+  "school": "T",
+  "educationLevel": "T",
+  "subjects": ["T"],
+  "skills": [
+    { "subject": "T", "level": "Beginner|Intermediate|Advanced" }
+  ],
+  "preferredLearningStyle": "T?",
+  "accommodations": "T?"
+}
+```
+
+---
+
+## 4  Mentor Module
+
+| #   | URL                       | Method   | Path Vars   | Query                                                                                       | Request Body       | Success                          | Errors                                           |     |
+| --- | ------------------------- | -------- | ----------- | ------------------------------------------------------------------------------------------- | ------------------ | -------------------------------- | ------------------------------------------------ | --- |
+| 4.1 | `/mentors/onboarding`     | **POST** | –           | –                                                                                           | `MentorOnboarding` | `MentorProfile` **201**          | 400                                              |     |
+| 4.2 | `/mentors/{id}`           | **GET**  | `{id:uuid}` | –                                                                                           | –                  | `MentorProfile` **200**          | 404                                              |     |
+| 4.3 | `/mentors`                | **GET**  | –           | `subjects?`:T, `level?`:T, `language?`:T, `duration?`:I, `page?`:I (≥1), `sort?`:T("rating" | "price")           | –                                | `{ data:[MentorCard], page:I, total:I }` **200** | 400 |
+| 4.4 | `/mentors/recommended`    | **GET**  | –           | –                                                                                           | –                  | `[MentorCard]` **200**           | 401                                              |     |
+| 4.5 | `/mentors/{id}/sessions`  | **GET**  | `{id:uuid}` | –                                                                                           | –                  | `[Session]` **200**              | 403, 404                                         |     |
+| 4.6 | `/mentors/{id}/analytics` | **GET**  | `{id:uuid}` | –                                                                                           | –                  | `{ agePie, subjectBar }` **200** | 403, 404                                         |     |
+
+`MentorOnboarding`
+
+```jsonc
+{
+  "fullName": "T",
+  "age": I,
+  "contactNumber": "T",
+  "bio": "T",
+  "professionalRole": "T",
+  "subjects": ["T"],
+  "experienceYears": I,
+  "preferredStudentLevels": ["T"],
+  "linkedinUrl": "T?",
+  "portfolioUrl": "T?",
+  "avatarUrl": "T?"
+}
+```
+
+---
+
+## 5  Booking & Session Lifecycle
+
+| #   | URL                     | Method     | Path Vars   | Query | Request Body                                                | Success                           | Errors          |                           |               |
+| --- | ----------------------- | ---------- | ----------- | ----- | ----------------------------------------------------------- | --------------------------------- | --------------- | ------------------------- | ------------- |
+| 5.1 | `/bookings`             | **POST**   | –           | –     | `{ mentorId:uuid, sessionDateTime:ISO, paymentProofUrl:T }` | `Booking` **201**                 | 400, 409        |                           |               |
+| 5.2 | `/bookings/{id}`        | **GET**    | `{id:uuid}` | –     | –                                                           | `Booking` **200**                 | 403, 404        |                           |               |
+| 5.3 | `/bookings/{id}`        | **DELETE** | `{id:uuid}` | –     | –                                                           | `{ message:"cancelled" }` **204** | 403, 404, 409   |                           |               |
+| 5.4 | `/sessions/{id}/status` | **PATCH**  | `{id:uuid}` | –     | \`{ status:"confirmed"                                      | "in-progress"                     | "completed" }\` | updated `Booking` **200** | 400, 403, 404 |
+
+`Booking`
 
 ```json
 {
   "id": "uuid",
   "studentId": "uuid",
   "mentorId": "uuid",
-  "sessionDateTime": "ISO-8601 string",
+  "sessionDateTime": "2025-07-25T09:00:00Z",
   "durationMinutes": 120,
-  "paymentProofUrl": "string",
-  "status": "pending | confirmed | completed | cancelled"
+  "paymentProofUrl": "https://...",
+  "status": "pending"
 }
 ```
 
 ---
 
-## Error Handling
-
-| HTTP Code                   | Meaning                               | Typical causes                           |
-| --------------------------- | ------------------------------------- | ---------------------------------------- |
-| `400 Bad Request`           | Validation failed                     | Missing required field, wrong enum value |
-| `401 Unauthorized`          | JWT missing/expired                   |                                          |
-| `403 Forbidden`             | Accessing another user’s resource     |                                          |
-| `404 Not Found`             | Resource ID doesn’t exist             |                                          |
-| `409 Conflict`              | Booking clash (mentor already booked) |                                          |
-| `429 Too Many Requests`     | Rate limit exceeded                   |                                          |
-| `500 Internal Server Error` | Unhandled exception                   |                                          |
-
-Errors return:
+## 6  Common Error Payload
 
 ```json
 {
   "error": {
     "code": 400,
-    "message": "Validation error",
-    "details": [ "email is invalid" ]
+    "message": "Validation failed",
+    "details": ["email is invalid"]
   }
 }
 ```
 
----
-
-## Rate Limiting
-
-* **Students & mentors:** 100 requests / minute per access token
-* **Unauthenticated:** 20 requests / minute by IP
-  `429 Too Many Requests` includes `Retry-After` header.
-
----
-
-## Versioning
-
-* Base path contains major version (`/api/v1`).
-* Backwards-compatible changes add fields or endpoints within the same path.
-* Breaking changes trigger `/api/v2` with separate OpenAPI spec.
-* `X-EduVibe-API-Version` response header echoes version served.
+* **400 Bad Request** – malformed or invalid data
+* **401 Unauthorized** – JWT missing/expired
+* **403 Forbidden** – resource owned by another user
+* **404 Not Found** – id not present
+* **409 Conflict** – double-booked slot, late cancellation, duplicate registration
+* **429 Too Many Requests** – rate limit (header `Retry-After`)
+* **500 Internal Server Error**
 
 ---
 
-## Changelog
+## 7  Rate Limiting & Versioning
 
-| Version | Date       | Notes                                                               |
-| ------- | ---------- | ------------------------------------------------------------------- |
-| **1.0** | 2025-07-19 | Initial specification derived from VibeFlow hackathon requirements. |
+| Rule            | Limit             |
+| --------------- | ----------------- |
+| Authenticated   | 100 req/min/token |
+| Unauthenticated | 20 req/min/IP     |
 
----
-
-### Appendix A – Sample Booking Lifecycle
-
-1. **Student** fetches `/mentors/recommended` → selects mentor `m1`.
-2. `POST /bookings` with chosen `sessionDateTime` and bank-slip URL → returns `pending` booking `b123`.
-3. **Mentor** sees `/mentors/me/sessions` → `PATCH /sessions/b123/status` `{ "status":"confirmed" }`.
-4. After session, mentor sets status `completed`. Student dashboard reflects update.
+> Major version in path (`/api/v1`). Breaking changes → **v2**; additive changes remain within v1.
 
 ---
 
-**End of Document**
+### Glossary
+
+| Term           | Meaning                                                                                                            |
+| -------------- | ------------------------------------------------------------------------------------------------------------------ |
+| **MentorCard** | Subset of mentor profile shown in listings (`id`, `fullName`, `avatarUrl`, `subjects`, `rating`, `ratePerSession`) |
+| **Session**    | A `Booking` viewed from the mentor’s perspective                                                                   |
+| **agePie**     | `{ "13-15":25, "16-18":40, "18+":35 }` (percentages)                                                               |
+| **subjectBar** | `{ "Physics":12, "Chemistry":9, "Biology":6 }` (session counts)                                                    |
+
+---
+
+**End of Expanded Endpoint Reference**
