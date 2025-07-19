@@ -32,6 +32,8 @@
   },
   "dependencies": {
     "@prisma/client": "^6.11.1",
-    "cors": "^2.8.5"
+    "@types/mongoose": "^5.11.96",
+    "cors": "^2.8.5",
+    "mongoose": "^8.16.4"
   }
 }
