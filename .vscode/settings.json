@@ -1,0 +1,8 @@
+{
+  "sonarlint.connectedMode.project": {
+    "projectKey": "EDUVIBE-BE"
+  },
+  "editor.codeActionsOnSave": { 
+    "source.fixAll.eslint": true 
+  }
+} 
