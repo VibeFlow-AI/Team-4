@@ -1,8 +1,9 @@
 import mongoose from 'mongoose';
+import config from './config';
 
 export const connectDatabase = async (): Promise<void> => {
   try {
-    const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/eduvibe';
+    const mongoUri = config.mongodb.uri;
     
     await mongoose.connect(mongoUri, {
       // These options are no longer needed in newer versions of mongoose

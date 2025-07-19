@@ -105,7 +105,7 @@ const studentSchema = new Schema<IStudent>({
 });
 
 // Indexes for recommendations and queries
-studentSchema.index({ userId: 1 });
+// Note: userId already has a unique index from the schema definition
 studentSchema.index({ subjects: 1 });
 studentSchema.index({ 'skills.subject': 1 });
 studentSchema.index({ educationLevel: 1 });

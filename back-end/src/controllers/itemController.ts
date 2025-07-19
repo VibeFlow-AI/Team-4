@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { prisma } from '../lib/prisma';
+import { Item } from '../models/Item';
 
 // Create an item
 export const createItem = async (
@@ -9,11 +9,20 @@ export const createItem = async (
 ) => {
   try {
     const { name } = req.body;
-    const item = await prisma.item.create({
-      data: {
-        name: name,
-      },
-    });
+    
+    if (!name) {
+      res.status(400).json({
+        error: {
+          code: 400,
+          message: 'Name is required',
+          details: ['Item name cannot be empty']
+        }
+      });
+      return;
+    }
+
+    const item = new Item({ name });
+    await item.save();
 
     res.status(201).json(item);
   } catch (error) {
@@ -28,7 +37,7 @@ export const getItems = async (
   next: NextFunction,
 ) => {
   try {
-    const items = await prisma.item.findMany();
+    const items = await Item.find().sort({ createdAt: -1 });
     res.json(items);
   } catch (error) {
     next(error);
@@ -42,14 +51,20 @@ export const getItemById = async (
   next: NextFunction,
 ) => {
   try {
-    const id = parseInt(req.params.id, 10);
-    const item = await prisma.item.findUnique({
-      where: { id },
-    });
+    const { id } = req.params;
+    const item = await Item.findById(id);
+    
     if (!item) {
-      res.status(404).json({ message: 'Item not found' });
+      res.status(404).json({
+        error: {
+          code: 404,
+          message: 'Item not found',
+          details: [`Item with id ${id} does not exist`]
+        }
+      });
       return;
     }
+    
     res.json(item);
   } catch (error) {
     next(error);
@@ -63,20 +78,39 @@ export const updateItem = async (
   next: NextFunction,
 ) => {
   try {
-    const id = parseInt(req.params.id, 10);
+    const { id } = req.params;
     const { name } = req.body;
 
-    const item = await prisma.item.update({
-      where: { id },
-      data: { name },
-    });
-
-    res.json(item);
-  } catch (error: any) {
-    if (error.code === 'P2025') {
-      res.status(404).json({ message: 'Item not found' });
+    if (!name) {
+      res.status(400).json({
+        error: {
+          code: 400,
+          message: 'Name is required',
+          details: ['Item name cannot be empty']
+        }
+      });
       return;
     }
+
+    const item = await Item.findByIdAndUpdate(
+      id,
+      { name },
+      { new: true, runValidators: true }
+    );
+
+    if (!item) {
+      res.status(404).json({
+        error: {
+          code: 404,
+          message: 'Item not found',
+          details: [`Item with id ${id} does not exist`]
+        }
+      });
+      return;
+    }
+
+    res.json(item);
+  } catch (error) {
     next(error);
   }
 };
@@ -88,18 +122,26 @@ export const deleteItem = async (
   next: NextFunction,
 ) => {
   try {
-    const id = parseInt(req.params.id, 10);
+    const { id } = req.params;
 
-    const deletedItem = await prisma.item.delete({
-      where: { id },
-    });
+    const deletedItem = await Item.findByIdAndDelete(id);
 
-    res.json(deletedItem);
-  } catch (error: any) {
-    if (error.code === 'P2025') {
-      res.status(404).json({ message: 'Item not found' });
+    if (!deletedItem) {
+      res.status(404).json({
+        error: {
+          code: 404,
+          message: 'Item not found',
+          details: [`Item with id ${id} does not exist`]
+        }
+      });
       return;
     }
+
+    res.json({
+      message: 'Item deleted successfully',
+      item: deletedItem
+    });
+  } catch (error) {
     next(error);
   }
 };

@@ -3,6 +3,7 @@ export { User, IUser } from './User';
 export { Student, IStudent, ISkill } from './Student';
 export { Mentor, IMentor } from './Mentor';
 export { Booking, IBooking } from './Booking';
+export { Item, IItem } from './Item';
 
 // Re-export mongoose for convenience
 export { Types } from 'mongoose';
