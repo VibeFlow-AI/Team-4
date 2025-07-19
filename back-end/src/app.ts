@@ -1,9 +1,10 @@
 import cors from 'cors';
 import express from 'express';
-import { errorHandler } from './middlewares/errorHandler';
-import itemRoutes from './routes/itemRoutes';
-import apiRoutes from './routes/index';
+import config from './config/config'; // Load config (which loads dotenv) first
 import { connectDatabase } from './config/database';
+import { errorHandler } from './middlewares/errorHandler';
+import apiRoutes from './routes/index';
+import itemRoutes from './routes/itemRoutes';
 
 const app = express();
 
@@ -12,7 +13,7 @@ connectDatabase().catch(console.error);
 
 // Enable CORS for all routes
 app.use(cors({
-  origin: process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:3000', 'http://localhost:5173'],
+  origin: process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:3001', 'http://localhost:5173'],
   credentials: true,
 }));
 

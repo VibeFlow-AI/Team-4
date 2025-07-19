@@ -142,7 +142,7 @@ const mentorSchema = new Schema<IMentor>({
 });
 
 // Indexes for search and recommendations
-mentorSchema.index({ userId: 1 });
+// Note: userId already has a unique index from the schema definition
 mentorSchema.index({ subjects: 1 });
 mentorSchema.index({ averageRating: -1 });
 mentorSchema.index({ ratePerSession: 1 });
