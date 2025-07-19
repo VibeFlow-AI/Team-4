@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Document, Schema } from 'mongoose';
 
 export interface IUser extends Document {
   _id: string;
@@ -6,6 +6,7 @@ export interface IUser extends Document {
   password: string;
   role: 'student' | 'mentor';
   name: string;
+  age: number;
   avatarUrl?: string;
   isEmailVerified: boolean;
   isActive: boolean;
@@ -34,6 +35,12 @@ const userSchema = new Schema<IUser>({
     type: String,
     required: true,
     trim: true,
+  },
+  age: {
+    type: Number,
+    required: true,
+    min: 5,
+    max: 100,
   },
   avatarUrl: {
     type: String,

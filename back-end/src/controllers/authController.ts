@@ -10,15 +10,15 @@ export class AuthController {
    */
   register = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const { role, email, password, name } = req.body;
+      const { role, email, password, name, age } = req.body;
 
       // Validate required fields
-      if (!role || !email || !password || !name) {
+      if (!role || !email || !password || !name || age === undefined) {
         res.status(400).json({
           error: {
             code: 400,
             message: 'Missing required fields',
-            details: ['role, email, password, and name are required']
+            details: ['role, email, password, name, and age are required']
           }
         });
         return;
@@ -31,6 +31,30 @@ export class AuthController {
             code: 400,
             message: 'Invalid role',
             details: ['Role must be either "student" or "mentor"']
+          }
+        });
+        return;
+      }
+
+      // Validate age
+      if (typeof age !== 'number' || age < 5 || age > 100) {
+        res.status(400).json({
+          error: {
+            code: 400,
+            message: 'Invalid age',
+            details: ['Age must be a number between 5 and 100']
+          }
+        });
+        return;
+      }
+
+      // Additional age validation for mentors
+      if (role === 'mentor' && age < 18) {
+        res.status(400).json({
+          error: {
+            code: 400,
+            message: 'Invalid age for mentor',
+            details: ['Mentors must be at least 18 years old']
           }
         });
         return;
@@ -71,6 +95,7 @@ export class AuthController {
         password: hashedPassword,
         role,
         name: name.trim(),
+        age,
         isEmailVerified: false,
         isActive: true,
       });
@@ -95,6 +120,7 @@ export class AuthController {
           email: user.email,
           name: user.name,
           role: user.role,
+          age: user.age,
           avatarUrl: user.avatarUrl,
         }
       });

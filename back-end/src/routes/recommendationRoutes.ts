@@ -1,12 +1,12 @@
 import { Router } from 'express';
 import {
-    getMentorProfile,
-    searchMentors,
+  getMentorProfile,
+  searchMentors,
 } from '../controllers/mentorSearchController';
 import {
-    getRecommendations,
-    getRecommendationsBySearch,
-    getRecommendationsForStudent,
+  getRecommendations,
+  getRecommendationsBySearch,
+  getRecommendationsForStudent,
 } from '../controllers/recommendationController';
 // import { authenticateToken } from '../middlewares/auth'; // You'll need to create this
 

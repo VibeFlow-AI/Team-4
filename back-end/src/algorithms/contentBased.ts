@@ -1,5 +1,5 @@
-import { IStudent } from '../models/Student';
 import { IMentor } from '../models/Mentor';
+import { IStudent } from '../models/Student';
 
 export interface ContentBasedScore {
   score: number;
