@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 
 interface Benefit {
   image: string;
@@ -8,6 +8,11 @@ interface Benefit {
 }
 
 const BENEFITS: Benefit[] = [
+  {
+    image: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=600&q=80",
+    title: "Personalized Learning",
+    description: "We tailor the mentorship experience to fit each student's unique goals, learning style, and pace making every session impactful.",
+  },
   {
     image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=600&q=80",
     title: "Real Mentors, Real Guidance",
@@ -23,42 +28,49 @@ const BENEFITS: Benefit[] = [
     title: "Insights-Driven Support",
     description: "We don't rely on guesswork. Our mentors use data, progress tracking, and evidence-based approaches to deliver meaningful guidance.",
   },
-  {
-    image: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=600&q=80",
-    title: "Personalized Learning",
-    description: "We tailor the mentorship experience to fit each student's unique goals, learning style, and pace making every session impactful.",
-  },
 ];
 
-const STEP_INTERVAL = 2000; // ms
-const CARD_WIDTH = 320; // px
-const FEATURED_WIDTH = 640; // px (twice as wide)
+const SLIDE_INTERVAL = 2500; // ms
+const CARD_WIDTH = 340; // px
 const GAP = 32; // px (gap-8)
+const VISIBLE_CARDS = 4;
 
 function BenefitsCarousel() {
-  const [cards, setCards] = useState(BENEFITS);
+  const [active, setActive] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
-  const [leaving, setLeaving] = useState(false);
+  const [x, setX] = useState(0);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Prepare a ring of cards for infinite loop
+  const getRing = () => {
+    const ring = [];
+    for (let i = 0; i < BENEFITS.length * 3; i++) {
+      ring.push(BENEFITS[i % BENEFITS.length]);
+    }
+    return ring;
+  };
+  const ring = getRing();
+  const start = BENEFITS.length; // always start in the middle ring
 
   useEffect(() => {
     if (isAnimating) return;
     timeoutRef.current = setTimeout(() => {
       setIsAnimating(true);
-      setLeaving(true);
+      setX((prev) => prev - (CARD_WIDTH + GAP));
       setTimeout(() => {
-        setCards((prev) => {
-          const next = [...prev];
-          const first = next.shift();
-          if (first) next.push(first);
-          return next;
-        });
-        setLeaving(false);
+        setActive((prev) => (prev + 1) % BENEFITS.length);
+        setX(-((CARD_WIDTH + GAP) * (start + active + 1 - VISIBLE_CARDS / 2)));
         setIsAnimating(false);
-      }, 700); // match animation duration
-    }, STEP_INTERVAL);
+      }, 600); // match animation duration
+    }, SLIDE_INTERVAL);
     return () => timeoutRef.current && clearTimeout(timeoutRef.current);
-  }, [cards, isAnimating]);
+  }, [active, isAnimating]);
+
+  // Calculate the initial offset to center the active card
+  useEffect(() => {
+    setX(-((CARD_WIDTH + GAP) * (start + active - VISIBLE_CARDS / 2)));
+    // eslint-disable-next-line
+  }, []);
 
   return (
     <section className="w-full bg-gradient-to-br from-blue-100 via-purple-100 to-yellow-100 py-16 px-2 sm:px-4">
@@ -69,105 +81,47 @@ function BenefitsCarousel() {
         <p className="text-lg sm:text-xl text-center text-black/80 max-w-3xl mx-auto mb-12">
           EduVibe is a student-mentor platform designed to personalize learning journeys. It connects students with mentors who offer guidance, support, and practical industry insights.
         </p>
-        <div className="overflow-hidden">
-          <div className="flex gap-8 justify-center items-stretch">
-            <AnimatePresence initial={false}>
-              {cards.map((benefit, idx) => {
-                // Only show 4 cards at a time
-                if (idx > 3) return null;
-                // Leftmost card: fade out and slide left when leaving
-                if (idx === 0 && leaving) {
-                  return (
-                    <motion.div
-                      key={benefit.title + idx}
-                      initial={{ opacity: 1, x: 0, width: FEATURED_WIDTH }}
-                      animate={{ opacity: 0, x: -40, width: FEATURED_WIDTH }}
-                      exit={{}}
-                      transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-                      className="flex-shrink-0"
-                      style={{ width: FEATURED_WIDTH }}
-                    >
-                      <BenefitCard benefit={benefit} featured />
-                    </motion.div>
-                  );
-                }
-                // Second card: stretch to featured width
-                if (idx === 1 && leaving) {
-                  return (
-                    <motion.div
-                      key={benefit.title + idx}
-                      initial={{ width: CARD_WIDTH, x: 0 }}
-                      animate={{ width: FEATURED_WIDTH, x: 0 }}
-                      exit={{}}
-                      transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-                      className="flex-shrink-0"
-                      style={{ width: CARD_WIDTH }}
-                    >
-                      <BenefitCard benefit={benefit} featured />
-                    </motion.div>
-                  );
-                }
-                // Other cards: slide left
-                if (idx > 1 && leaving) {
-                  return (
-                    <motion.div
-                      key={benefit.title + idx}
-                      initial={{ x: 0, width: CARD_WIDTH }}
-                      animate={{ x: - (FEATURED_WIDTH - CARD_WIDTH), width: CARD_WIDTH }}
-                      exit={{}}
-                      transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-                      className="flex-shrink-0"
-                      style={{ width: CARD_WIDTH }}
-                    >
-                      <BenefitCard benefit={benefit} />
-                    </motion.div>
-                  );
-                }
-                // Normal state
+        <div className="relative flex justify-center items-center w-full">
+          <div className="w-full max-w-5xl overflow-x-hidden">
+            <motion.div
+              className="flex gap-8 py-4"
+              style={{ width: (CARD_WIDTH + GAP) * ring.length }}
+              animate={{ x }}
+              transition={isAnimating ? { type: "spring", stiffness: 300, damping: 30 } : { duration: 0 }}
+            >
+              {ring.map((benefit, idx) => {
+                // Determine if this is the active card
+                const isActive = idx === start + active;
                 return (
-                  <motion.div
+                  <div
                     key={benefit.title + idx}
-                    initial={false}
-                    animate={{ width: idx === 0 ? FEATURED_WIDTH : CARD_WIDTH, opacity: 1, x: 0 }}
-                    transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-                    className="flex-shrink-0"
-                    style={{ width: idx === 0 ? FEATURED_WIDTH : CARD_WIDTH }}
+                    className={`relative flex-shrink-0 bg-white rounded-3xl overflow-hidden flex flex-col h-full min-h-[420px] border border-gray-200 shadow-md transition-all duration-300 ${isActive ? 'scale-105 ring-2 ring-blue-300 z-10' : 'scale-90 opacity-70 z-0'}`}
+                    style={{ width: CARD_WIDTH }}
                   >
-                    <BenefitCard benefit={benefit} featured={idx === 0} />
-                  </motion.div>
+                    <div className="relative w-full h-64 sm:h-72 md:h-60 lg:h-64 xl:h-72 flex-shrink-0">
+                      <img
+                        src={benefit.image}
+                        alt={benefit.title}
+                        className="w-full h-full object-cover object-center"
+                      />
+                      <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-white via-white/80 to-transparent" />
+                    </div>
+                    <div className="flex-1 flex flex-col justify-end p-6 pt-4">
+                      <div className="font-bold text-2xl md:text-xl lg:text-2xl text-black mb-2 leading-tight">
+                        {benefit.title}
+                      </div>
+                      <div className="text-gray-800 text-base md:text-sm lg:text-base leading-snug">
+                        {benefit.description}
+                      </div>
+                    </div>
+                  </div>
                 );
               })}
-            </AnimatePresence>
+            </motion.div>
           </div>
         </div>
       </div>
     </section>
-  );
-}
-
-function BenefitCard({ benefit, featured }: { benefit: Benefit; featured?: boolean }) {
-  return (
-    <div
-      className={`bg-white rounded-3xl shadow-md overflow-hidden flex flex-col h-full min-h-[420px] ${featured ? 'border-2 border-blue-300' : ''}`}
-      style={{ boxShadow: '0 4px 24px 0 rgba(0,0,0,0.07)' }}
-    >
-      <div className="relative w-full h-64 sm:h-72 md:h-60 lg:h-64 xl:h-72 flex-shrink-0">
-        <img
-          src={benefit.image}
-          alt={benefit.title}
-          className="w-full h-full object-cover object-center"
-        />
-        <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-white via-white/80 to-transparent" />
-      </div>
-      <div className="flex-1 flex flex-col justify-end p-6 pt-4">
-        <div className="font-bold text-2xl md:text-xl lg:text-2xl text-black mb-2 leading-tight">
-          {benefit.title}
-        </div>
-        <div className="text-gray-800 text-base md:text-sm lg:text-base leading-snug">
-          {benefit.description}
-        </div>
-      </div>
-    </div>
   );
 }
 
