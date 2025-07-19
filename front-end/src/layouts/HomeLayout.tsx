@@ -1,5 +1,5 @@
-import { Navbar } from "./Navbar";
-import type { NavbarLink, NavbarButton } from "./Navbar";
+import { Navbar } from "../components/Navbar";
+import type { NavbarLink, NavbarButton } from "../components/Navbar";
 import type { ReactNode } from "react";
 
 interface HomeLayoutProps {

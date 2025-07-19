@@ -1,5 +1,5 @@
 
-import HomeLayout from "@/components/HomeLayout";
+import HomeLayout from "@/layouts/HomeLayout";
 import Hero from "@/components/home/hero";
 
 function HomePage() {

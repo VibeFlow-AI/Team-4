@@ -1,4 +1,4 @@
-import HomeLayout from "@/components/HomeLayout";
+import HomeLayout from "@/layouts/HomeLayout";
 
 function LoginPage() {
   return (
